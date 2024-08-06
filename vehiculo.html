@@ -1,0 +1,157 @@
+<html>
+
+<head>
+    
+</head>
+<body>
+
+    <select id = "cargadeclientes">
+
+    </select>
+<input type="text" placeholder="Escriba la placa" id="placa"/>
+<input type="text" placeholder="Escriba el color" id="color"/>
+<input type="text" placeholder="Escriba la marca" id="marca"/>
+<input type="text" placeholder="Escriba el motor" id="motor"/>
+
+
+
+<input type="button" value="Guardar" onclick="guarda()"/>
+<div id="espacioTabla">
+    <table>
+    <thead>
+    <tr>
+    <td>Placa</td>
+   
+    <td>Color</td>
+    <td>Marca</td>
+    <td>Motor</td>
+    <td>Dueno</td>
+    <td>Modificar</td>
+    <td>Eliminar</td>
+    </tr>
+    </thead>
+    <tbody id="cuerpoTabla">
+    </tbody>
+    </table>
+    </div>
+
+<script type="text/javascript">
+function cargarDatos()
+        {
+        var objetoaenviar = new Object();
+                    
+            try
+                {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('GET','/vehiculo');
+                    xhr.setRequestHeader('Content-Type','application/json');
+                    xhr.onload = function()
+                    {
+                    if(xhr.status == 200)
+                        {
+                            console.log(JSON.parse(xhr.responseText));
+                            rellenaTabla(JSON.parse(xhr.responseText))
+                        }
+                    else
+                        {
+                            console.log(xhr);
+                        }
+                    };
+                    xhr.send();
+                    }
+            catch(err)
+                {
+                    console.log(err.message);
+                }
+        }
+function cargarDatosCliente()
+        {
+        var objetoaenviar = new Object();
+                    
+            try
+                {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('GET','/cliente');
+                    xhr.setRequestHeader('Content-Type','application/json');
+                    xhr.onload = function()
+                    {
+                    if(xhr.status == 200)
+                        {
+                            console.log(JSON.parse(xhr.responseText));
+                            rellenaselect(JSON.parse(xhr.responseText))
+                        }
+                    else
+                        {
+                            console.log(xhr);
+                        }
+                    };
+                    xhr.send();
+                    }
+            catch(err)
+                {
+                    console.log(err.message);
+                }
+        }
+function rellenaselect(vector)
+        {
+        document.getElementById("cargadeclientes").innerHTML =""
+        for (var elemento in vector)
+            {
+                document.getElementById("cargadeclientes").innerHTML += "<option id = " + vector[elemento].cedula + " value = " + vector[elemento].cedula + ">" + vector[elemento].cedula + " " + vector[elemento].tipo + " </option>"
+            }
+           
+        }
+
+        cargarDatosCliente()
+
+function guarda()
+
+
+        {
+            
+            var objetoaenviar = new Object();
+            objetoaenviar.placa = document.getElementById("placa").value
+            objetoaenviar.color = document.getElementById("color").value        
+            objetoaenviar.marca = document.getElementById("marca").value
+            objetoaenviar.motor = document.getElementById("motor").value  
+            objetoaenviar.duenno = document.getElementById("cargadeclientes").value
+            try
+                {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('PUT','/vehiculo');
+                    xhr.setRequestHeader('Content-Type','application/json');
+                    xhr.onload = function()
+                    {
+                    if(xhr.status == 200)
+                        {
+                            console.log(JSON.parse(xhr.responseText));
+                            alert('Guardado')
+                            rellenaTabla(JSON.parse(xhr.responseText))
+
+                        }
+                    else
+                        {
+                            console.log(xhr);
+                        }
+                    };
+                    xhr.send(JSON.stringify(objetoaenviar));
+                    }
+            catch(err)
+                {
+                    console.log(err.message);
+                }
+        }
+
+        function rellenaTabla(vector)
+        {
+        document.getElementById("cuerpoTabla").innerHTML =""
+        document.getElementById("cuerpoTabla").innerHTML += "<tr>"
+        for (var elemento in vector)
+            {
+                document.getElementById("cuerpoTabla").innerHTML += "<td>" + vector[elemento].placa + "</td><td>"+ vector[elemento].color  +"</td><td>"+ vector[elemento].marca  +"</td><td>"+ vector[elemento].motor  + "</td><td>"+ vector[elemento].duenno  + "</td><td><input type= 'button' value = 'Modificar' onclick= 'modificar()' /></td><td><input type= 'button' value = 'Eliminar' onclick= 'eliminar()' /></td><td>"
+            }
+            document.getElementById("cuerpoTabla").innerHTML += "</tr>"
+        }
+</script>
+</body>
+</html>

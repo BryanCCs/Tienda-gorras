@@ -1,0 +1,307 @@
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f4f4f4;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        
+        input[type="text"] {
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        
+        input[type="button"] {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+        
+        input[type="button"]:hover {
+            background-color: #0056b3;
+        }
+        
+        h3 {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        
+        #espacioTablaGorras, #espacioTabla {
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #f4f4f4;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <input type="text" placeholder="Escriba el identificador" id="identificador"/>
+        <input type="text" placeholder="Escriba la fecha" id="fecha"/>
+
+        <h3>Seleccione las gorras</h3>
+        <div id="espacioTablaGorras">
+            <table>
+                <thead>
+                    <tr>
+                        <td>Identificador</td>
+                        <td>Marca</td>
+                        <td>Color</td>
+                        <td>Costo</td>
+                        <td>Agregar</td>
+                    </tr>
+                </thead>
+                <tbody id="cuerpoTablaGorras">
+                </tbody>
+            </table>
+        </div>
+        
+        <div id="listadeGorrasagregados">
+            <!-- Aquí puedes agregar contenido dinámico de las gorras agregadas -->
+        </div>
+
+        <input type="text" placeholder="Monto total" id="montoTotal" disabled/>
+        <input type="button" value="Guardar" onclick="guarda()"/>
+
+        <div id="espacioTabla">
+            <table>
+                <thead>
+                    <tr>
+                        <td>Identificador</td>
+                        <td>Fecha</td>
+                        <td>Monto Total</td>
+                        <td>Gorra Comprada</td>
+                        <td>Modificar</td>
+                        <td>Eliminar</td>
+                    </tr>
+                </thead>
+                <tbody id="cuerpoTabla">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
+
+
+<script type="text/javascript">
+
+    var montoTotal = 0
+    var listadeGorras = []
+
+        function cargarDatosGorras()
+        {
+        var objetoaenviar = new Object();
+                    
+            try
+                {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('GET','/gorra');
+                    xhr.setRequestHeader('Content-Type','application/json');
+                    xhr.onload = function()
+                    {
+                    if(xhr.status == 200)
+                        {
+                            console.log(JSON.parse(xhr.responseText));
+                            rellenaTablaGorras(JSON.parse(xhr.responseText))
+                        }
+                    else
+                        {
+                            console.log(xhr);
+                        }
+                    };
+                    xhr.send();
+                    }
+            catch(err)
+                {
+                    console.log(err.message);
+                }
+        }
+
+        function rellenaTablaGorras(vector)
+        {
+        document.getElementById("cuerpoTablaGorras").innerHTML =""
+        document.getElementById("cuerpoTablaGorras").innerHTML += "<tr>"
+        for (var elemento in vector)
+            {
+                document.getElementById("cuerpoTablaGorras").innerHTML += "<td>" + vector[elemento]. identificacion + "</td><td>"+ vector[elemento].marca  + "</td><td>"+ vector[elemento].color  + "</td><td>"+ vector[elemento].costo  + "</td><td><input type= 'button' value = 'Agregar' onclick= 'agregarGorra(\""+ vector[elemento].identificador +"\",\""+ vector[elemento].costo +"\")' /></td><td>"
+            }
+            document.getElementById("cuerpoTablaGorras").innerHTML += "</tr>"
+        }
+
+        function cargarDatos()
+            {
+            var objetoaenviar = new Object();
+                        
+                try
+                    {
+                        var xhr = new XMLHttpRequest();
+                        xhr.open('GET','/factura');
+                        xhr.setRequestHeader('Content-Type','application/json');
+                        xhr.onload = function()
+                        {
+                        if(xhr.status == 200)
+                            {
+                                console.log(JSON.parse(xhr.responseText));
+                                rellenaTabla(JSON.parse(xhr.responseText))
+                            }
+                        else
+                            {
+                                console.log(xhr);
+                            }
+                        };
+                        xhr.send();
+                        }
+                catch(err)
+                    {
+                        console.log(err.message);
+                    }
+            }
+
+        function guarda()
+        {
+            
+            var objetoaenviar = new Object();
+            objetoaenviar.identificador = document.getElementById("identificador").value
+            objetoaenviar.fecha = document.getElementById("fecha").value        
+            objetoaenviar.montoTotal = document.getElementById("montoTotal").value
+            objetoaenviar.gorraComprada = document.getElementById("gorraComprada").value  
+           
+          
+            try
+                {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('PUT','/factura');
+                    xhr.setRequestHeader('Content-Type','application/json');
+                    xhr.onload = function()
+                    {
+                    if(xhr.status == 200)
+                        {
+                            console.log(JSON.parse(xhr.responseText));
+                            alert('Guardado')
+                            GuardaTodoslosGorras()
+                            
+                            rellenaTabla(JSON.parse(xhr.responseText))
+
+                        }
+                    else
+                        {
+                            console.log(xhr);
+                        }
+                    };
+                    xhr.send(JSON.stringify(objetoaenviar));
+                    }
+            catch(err)
+                {
+                    console.log(err.message);
+                }
+        }
+
+        function rellenaTabla(vector)
+        {
+        document.getElementById("cuerpoTabla").innerHTML =""
+        document.getElementById("cuerpoTabla").innerHTML += "<tr>"
+        for (var elemento in vector)
+            {
+              
+                document.getElementById("cuerpoTabla").innerHTML += "<td>" + vector[elemento].identificador + "</td><td>"+ vector[elemento].fecha  +"</td><td>"+ vector[elemento].montoTotal  +"</td><td>"+ vector[elemento].gorraComprada  + "</td><td><input type= 'button' value = 'Modificar' onclick= 'modificar()' /></td><td><input type= 'button' value = 'Eliminar' onclick= 'eliminar()' /></td><td>"
+            }
+            document.getElementById("cuerpoTabla").innerHTML += "</tr>"
+        }
+
+        function agregarGorra(identificador, costo)
+        {
+            listadeGorras.push(identificador)
+            montoTotal = montoTotal + parseFloat(costo)
+            document.getElementById("montoTotal").value = montoTotal
+            document.getElementById("listadeGorrasagregados").innerHTML = ""
+            for(var elemento in listadeGorras)
+            {
+                document.getElementById("listadeGorrasagregados").innerHTML += listadeGorras[elemento] + "<hr>"
+            }
+        }
+        function GuardaTodaslasGorras()
+        {
+            for(var elemento in listadeGorras)
+            {
+            var objetoaenviar = new Object();
+            objetoaenviar.identificadorFactura = document.getElementById("identificador").value
+            objetoaenviar.identificadorGorra = listadeGorras[elemento]       
+          
+            try
+                {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('PUT','/facturagorra');
+                    xhr.setRequestHeader('Content-Type','application/json');
+                    xhr.onload = function()
+                    {
+                    if(xhr.status == 200)
+                        {
+                            console.log(JSON.parse(xhr.responseText));
+                            alert('Guardado gorra ' + listadeGorras[elemento])
+                           
+                        }
+                    else
+                        {
+                            console.log(xhr);
+                        }
+                    };
+                    xhr.send(JSON.stringify(objetoaenviar));
+                    }
+            catch(err)
+                {
+                    console.log(err.message);
+                }
+             }
+        }
+        cargarDatosGorras()
+
+</script>
+</body>
+</html>

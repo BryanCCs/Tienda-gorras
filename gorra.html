@@ -1,0 +1,182 @@
+<html>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f4f4f4;
+        }
+        
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        
+        input[type="text"] {
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        
+        input[type="button"] {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+        
+        input[type="button"]:hover {
+            background-color: #0056b3;
+        }
+        
+        #espacioTabla {
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #f4f4f4;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <input type="text" placeholder="identificacion" id="identificacion"/>
+        <input type="text" placeholder="Marca" id="marca"/>
+        <input type="text" placeholder="color" id="color"/>
+        <input type="text" placeholder="costo por unidad" id="costo"/>
+        <input type="button" value="Guardar" onclick="guarda()"/>
+        <div id="espacioTabla">
+            <table>
+                <thead>
+                    <tr>
+                        <td>identificacion</td>
+                        <td>Marca</td>
+                        <td>color</td>
+                        <td>costo por unidad</td>
+                        <td>Modificar</td>
+                        <td>Eliminar</td>
+                    </tr>
+                </thead>
+                <tbody id="cuerpoTabla">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+<script type="text/javascript">
+function cargarDatos()
+        {
+        var objetoaenviar = new Object();
+                    
+            try
+                {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('GET','/gorra');
+                    xhr.setRequestHeader('Content-Type','application/json');
+                    xhr.onload = function()
+                    {
+                    if(xhr.status == 200)
+                        {
+                            console.log(JSON.parse(xhr.responseText));
+                            rellenaTabla(JSON.parse(xhr.responseText))
+                        }
+                    else
+                        {
+                            console.log(xhr);
+                        }
+                    };
+                    xhr.send();
+                    }
+            catch(err)
+                {
+                    console.log(err.message);
+                }
+        }
+
+function guarda()
+
+
+        {
+            var objetoaenviar = new Object();
+            objetoaenviar.identificacion = document.getElementById("identificacion").value
+            objetoaenviar.marca = document.getElementById("marca").value        
+            objetoaenviar.color = document.getElementById("color").value  
+            objetoaenviar.costo = document.getElementById("costo").value        
+            try
+                {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('PUT','/gorra');
+                    xhr.setRequestHeader('Content-Type','application/json');
+                    xhr.onload = function()
+                    {
+                    if(xhr.status == 200)
+                        {
+                            console.log(JSON.parse(xhr.responseText));
+                            alert('Guardado')
+                            rellenaTabla(JSON.parse(xhr.responseText))
+
+                        }
+                    else
+                        {
+                            console.log(xhr);
+                        }
+                    };
+                    xhr.send(JSON.stringify(objetoaenviar));
+                    }
+            catch(err)
+                {
+                    console.log(err.message);
+                }
+        }
+
+        function rellenaTabla(vector)
+        {
+        document.getElementById("cuerpoTabla").innerHTML =""
+        document.getElementById("cuerpoTabla").innerHTML += "<tr>"
+        for (var elemento in vector)
+            {
+                document.getElementById("cuerpoTabla").innerHTML += "<td>" + vector[elemento].identificacion + "</td><td>"+ vector[elemento].marca  + "</td><td>"+ vector[elemento].color  + "</td><td>"+ vector[elemento].costo  + "</td><td><input type= 'button' value = 'Modificar' onclick= 'modificar()' /></td><td><input type= 'button' value = 'Eliminar' onclick= 'eliminar()' /></td><td>"
+            }
+            document.getElementById("cuerpoTabla").innerHTML += "</tr>"
+        }
+
+
+</script>
+</body>
+</html>

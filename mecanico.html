@@ -1,0 +1,148 @@
+<html>
+
+<head>
+    
+</head>
+<body>
+
+    <select id = "cargadepersonas">
+
+    </select>
+<input type="text" placeholder="Escriba la especialidad" id="especialidad"/>
+<input type="text" placeholder="Escriba el salario por hora" id="salarioxHora"/>
+
+<input type="button" value="Guardar" onclick="guarda()"/>
+<div id="espacioTabla">
+    <table>
+    <thead>
+    <tr>
+    <td>Cedula</td>
+   
+    <td>Especilidad</td>
+    <td>alario por hora</td>
+    <td>Modificar</td>
+    <td>Eliminar</td>
+    </tr>
+    </thead>
+    <tbody id="cuerpoTabla">
+    </tbody>
+    </table>
+    </div>
+
+<script type="text/javascript">
+function cargarDatos()
+        {
+        var objetoaenviar = new Object();
+                    
+            try
+                {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('GET','/mecanico');
+                    xhr.setRequestHeader('Content-Type','application/json');
+                    xhr.onload = function()
+                    {
+                    if(xhr.status == 200)
+                        {
+                            console.log(JSON.parse(xhr.responseText));
+                            rellenaTabla(JSON.parse(xhr.responseText))
+                        }
+                    else
+                        {
+                            console.log(xhr);
+                        }
+                    };
+                    xhr.send();
+                    }
+            catch(err)
+                {
+                    console.log(err.message);
+                }
+        }
+function cargarDatosPersona()
+        {
+        var objetoaenviar = new Object();
+                    
+            try
+                {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('GET','/persona');
+                    xhr.setRequestHeader('Content-Type','application/json');
+                    xhr.onload = function()
+                    {
+                    if(xhr.status == 200)
+                        {
+                            console.log(JSON.parse(xhr.responseText));
+                            rellenaselect(JSON.parse(xhr.responseText))
+                        }
+                    else
+                        {
+                            console.log(xhr);
+                        }
+                    };
+                    xhr.send();
+                    }
+            catch(err)
+                {
+                    console.log(err.message);
+                }
+        }
+function rellenaselect(vector)
+        {
+        document.getElementById("cargadepersonas").innerHTML =""
+        for (var elemento in vector)
+            {
+                document.getElementById("cargadepersonas").innerHTML += "<option id = " + vector[elemento].cedula + " value = " + vector[elemento].cedula + ">" + vector[elemento].cedula + " " + vector[elemento].nombre + " </option>"
+            }
+           
+        }
+
+cargarDatosPersona()
+
+function guarda()
+
+
+        {
+            var objetoaenviar = new Object();
+            objetoaenviar.cedula = document.getElementById("cargadepersonas").value
+            objetoaenviar.especialidad = document.getElementById("especialidad").value        
+            objetoaenviar.salarioxHora = document.getElementById("salarioxHora").value 
+            try
+                {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('PUT','/mecanico');
+                    xhr.setRequestHeader('Content-Type','application/json');
+                    xhr.onload = function()
+                    {
+                    if(xhr.status == 200)
+                        {
+                            console.log(JSON.parse(xhr.responseText));
+                            alert('Guardado')
+                            rellenaTabla(JSON.parse(xhr.responseText))
+
+                        }
+                    else
+                        {
+                            console.log(xhr);
+                        }
+                    };
+                    xhr.send(JSON.stringify(objetoaenviar));
+                    }
+            catch(err)
+                {
+                    console.log(err.message);
+                }
+        }
+
+        function rellenaTabla(vector)
+        {
+        document.getElementById("cuerpoTabla").innerHTML =""
+        document.getElementById("cuerpoTabla").innerHTML += "<tr>"
+        for (var elemento in vector)
+            {
+                document.getElementById("cuerpoTabla").innerHTML += "<td>" + vector[elemento].cedula + "</td><td>"+ vector[elemento].especialidad  +  "</td><td>"+ vector[elemento].salarioxHora  + "</td><td><input type= 'button' value = 'Modificar' onclick= 'modificar()' /></td><td><input type= 'button' value = 'Eliminar' onclick= 'eliminar()' /></td><td>"
+            }
+            document.getElementById("cuerpoTabla").innerHTML += "</tr>"
+        }
+</script>
+</body>
+</html>

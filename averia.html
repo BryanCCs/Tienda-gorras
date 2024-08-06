@@ -1,0 +1,107 @@
+<html>
+
+<head>
+    
+</head>
+<body>
+
+  
+<input type="text" placeholder="Identificador" id="identificador"/>
+<input type="text" placeholder="Nombre" id="nombre"/>
+<input type="button" value="Guardar" onclick="guarda()"/>
+<div id="espacioTabla">
+    <table>
+    <thead>
+    <tr>
+    <td>Identificador</td>
+   
+    <td>Nombre</td>
+    <td>Modificar</td>
+    <td>Eliminar</td>
+    </tr>
+    </thead>
+    <tbody id="cuerpoTabla">
+    </tbody>
+    </table>
+    </div>
+
+<script type="text/javascript">
+function cargarDatos()
+        {
+        var objetoaenviar = new Object();
+                    
+            try
+                {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('GET','/averia');
+                    xhr.setRequestHeader('Content-Type','application/json');
+                    xhr.onload = function()
+                    {
+                    if(xhr.status == 200)
+                        {
+                            console.log(JSON.parse(xhr.responseText));
+                            rellenaTabla(JSON.parse(xhr.responseText))
+                        }
+                    else
+                        {
+                            console.log(xhr);
+                        }
+                    };
+                    xhr.send();
+                    }
+            catch(err)
+                {
+                    console.log(err.message);
+                }
+        }
+
+
+
+function guarda()
+
+
+        {
+            var objetoaenviar = new Object();
+            objetoaenviar.identificador = document.getElementById("identificador").value
+            objetoaenviar.nombre = document.getElementById("nombre").value        
+                    
+            try
+                {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('PUT','/averia');
+                    xhr.setRequestHeader('Content-Type','application/json');
+                    xhr.onload = function()
+                    {
+                    if(xhr.status == 200)
+                        {
+                            console.log(JSON.parse(xhr.responseText));
+                            alert('Guardado')
+                            rellenaTabla(JSON.parse(xhr.responseText))
+
+                        }
+                    else
+                        {
+                            console.log(xhr);
+                        }
+                    };
+                    xhr.send(JSON.stringify(objetoaenviar));
+                    }
+            catch(err)
+                {
+                    console.log(err.message);
+                }
+        }
+
+        function rellenaTabla(vector)
+        {
+        document.getElementById("cuerpoTabla").innerHTML =""
+        document.getElementById("cuerpoTabla").innerHTML += "<tr>"
+        for (var elemento in vector)
+            {
+                document.getElementById("cuerpoTabla").innerHTML += "<td>" + vector[elemento].identificador + "</td><td>"+ vector[elemento].nombre  + "</td><td><input type= 'button' value = 'Modificar' onclick= 'modificar()' /></td><td><input type= 'button' value = 'Eliminar' onclick= 'eliminar()' /></td><td>"
+            }
+            document.getElementById("cuerpoTabla").innerHTML += "</tr>"
+        }
+</script>
+</body>
+</html>
